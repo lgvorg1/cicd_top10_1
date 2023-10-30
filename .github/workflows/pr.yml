@@ -68,9 +68,9 @@ jobs:
       - name: Archive building artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: archive-dist
+          name: archive-bin
           path: |
-            dist
+            bin
 
       #- name: Archive code coverage results
       #  uses: actions/upload-artifact@v3
