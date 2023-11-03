@@ -10,18 +10,26 @@ env:
 jobs:
   build_and_test_and_merge:
     runs-on: ubuntu-latest
+
     steps:
+      # checkout PR code
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Number of commits to fetch. 0 indicates all history for all branches and tags.
+          # Default: 1
+          fetch-depth: '0'
+          # This is to get the PR code instead of the repo code
+          ref: ${{ github.event.pull_request.head.sha }}
 
+      # Simulation of a compilation
       - name: Building ... 
         run: |
           mkdir ./bin
           echo "My bin file-1" > ./bin/mybin.exe
           ls -lR 
-
       
-      # Runs tests
+      # Simulation of running tests
       - name: Running tests ...
         id : run_tests
         run: |
@@ -65,12 +73,12 @@ jobs:
                   https://api.github.com/repos/lgvorg1/"${{github.event.repository.name}}"/pulls/"$PR_ID"/merge \
                   -d '{"commit_title":"Expand enum","commit_message":"Add a new value to the merge_method enum"}'
           
-      - name: Archive building artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: archive-bin
-          path: |
-            bin
+      #- name: Archive building artifacts
+      #  uses: actions/upload-artifact@v3
+      #  with:
+      #    name: archive-bin
+      #    path: |
+      #      bin
 
       #- name: Archive code coverage results
       #  uses: actions/upload-artifact@v3
