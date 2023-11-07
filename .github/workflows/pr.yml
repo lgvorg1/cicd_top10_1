@@ -8,7 +8,7 @@ env:
   MY_SECRET: ${{ secrets.MY_SECRET }}
   
 jobs:
-  build_and_test_and_merge:
+  pr_build_test_and_merge:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,7 +26,8 @@ jobs:
       - name: Building ... 
         run: |
           mkdir ./bin
-          touch ./bin/mybin.exe 
+          touch ./bin/mybin.exe
+          ls -lR 
       
       # Simulation of running tests
       - name: Running tests ...
@@ -34,7 +35,8 @@ jobs:
         run: |
           echo Running tests..
           chmod +x runtests.sh
-          ./runtests.sh
+          cat ./runtests.sh
+          ./runtests.sh "${{ github.event.pull_request.user.login }}" "${{ github.workflow }}"
           export ret_value=$?
           echo ret_value $ret_value
           cat runtests.out
@@ -61,7 +63,7 @@ jobs:
       - name: pr_merge_pr_true
         if: steps.check_pr.outputs.merge == 'true' && steps.run_tests.outputs.run_tests == 'OK'
         run: |
-          echo "The merge check was ${{ steps.check_pr.outputs.merge }}"
+          echo "The merge check for PR id $PR_ID was ${{ steps.check_pr.outputs.merge }}"
           echo "Merge conditions successfully MEET!!!"
           echo "Merging .."
           curl -L \
@@ -69,28 +71,5 @@ jobs:
                   -H "Accept: application/vnd.github+json" \
                   -H "Authorization: Bearer $GITHUB_PAT" \
                   -H "X-GitHub-Api-Version: 2022-11-28" \
-                  https://api.github.com/repos/lgvorg1/"${{github.event.repository.name}}"/pulls/"$PR_ID"/merge \
+                  https://api.github.com/repos/lgvorg1/"${{github.event.repository.name}}"/pulls/${{github.event.number}}/merge \
                   -d '{"commit_title":"Expand enum","commit_message":"Add a new value to the merge_method enum"}'
-          
-      #- name: Archive building artifacts
-      #  uses: actions/upload-artifact@v3
-      #  with:
-      #    name: archive-bin
-      #    path: |
-      #      bin
-
-      #- name: Archive code coverage results
-      #  uses: actions/upload-artifact@v3
-      #  with:
-      #    name: archive-output
-      #    path: output/output.txt
-
-      #- uses: actions/download-artifact@v3
-      #  with:
-      #    name: archive-dist
-      #    path: path/to/artifact
-
-      #- name: Display structure of downloaded files
-      #  run: ls -R
-      #  working-directory: path/to/artifact
-
