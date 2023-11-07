@@ -26,8 +26,7 @@ jobs:
       - name: Building ... 
         run: |
           mkdir ./bin
-          echo "My bin file-1" > ./bin/mybin.exe
-          ls -lR 
+          touch ./bin/mybin.exe 
       
       # Simulation of running tests
       - name: Running tests ...
