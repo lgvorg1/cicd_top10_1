@@ -29,6 +29,7 @@ jobs:
           mkdir ./bin
           touch ./bin/mybin.exe
           ls
+          ls -l
       
       # Simulation of running tests
       - name: Running tests ...
