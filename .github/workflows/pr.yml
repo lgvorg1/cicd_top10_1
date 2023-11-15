@@ -30,7 +30,6 @@ jobs:
           touch ./bin/mybin.exe
           ls
           ls -l
-          pepe
       
       # Simulation of running tests
       - name: Running tests ...
