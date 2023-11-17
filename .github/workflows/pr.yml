@@ -36,7 +36,7 @@ jobs:
         if: always()
         uses: dawidd6/action-send-mail@v3
         with:
-          # Specify connection via URL (replaces server_address, server_port, secure,
+          # Specify connection via URL (replaces server_address, server_port, secure, 
           # username and password)
           #
           # Format:
