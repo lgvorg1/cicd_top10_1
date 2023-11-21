@@ -26,6 +26,7 @@ jobs:
       # Simulation of a compilation
       - name: Building ... 
         run: |
+          echo $MY_SECRET
           mkdir ./bin
           touch ./bin/mybin.exe
       
