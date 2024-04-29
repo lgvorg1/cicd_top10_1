@@ -51,17 +51,16 @@ jobs:
           echo XY_USERNAME $XY_USERNAME
           echo xy-env ${{ github.event.inputs.xy-env }}
           echo KAKA $KAKA
-          #echo "{environment_variable_name}={value}" >> $GITHUB_ENV
           
           case "${{ github.event.inputs.xy-env }}" in 
           'PRO')
             echo "PRO"
-            echo "XY_USERNAME=${{ secrets.XY_USERNAME_PRO }}" >> $GITHUB_ENV
+            echo XY_USERNAME=${{ secrets.XY_USERNAME_PRO }} >> $GITHUB_ENV
           'DEMO')
             echo "DEMO"
           'PARTNERS'
             echo "PARTNERS"
-            echo "XY_USERNAME=${{ secrets.XY_USERNAME_PARTNERS }}" >> $GITHUB_ENV
+            echo XY_USERNAME=${{ secrets.XY_USERNAME_PARTNERS }} >> $GITHUB_ENV
           *)
             echo "DEFAULT"
 
