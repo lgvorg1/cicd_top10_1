@@ -26,7 +26,7 @@ env:
   XY_ENV: ${{ github.event.inputs.xy-env }}
   KAKA: XY_USERNAME_${{ github.event_name == 'push' && 'PRO' || github.event.inputs.xy-env }}
   
-  XY_USERNAME: ${{ secrets.XY_USERNAME_PARTNERS }}
+  #XY_USERNAME: ${{ secrets.XY_USERNAME_PARTNERS }}
   #XY_USERNAME: ${{ secrets.XY_USERNAME_"${{ github.event.inputs.xy-env }}"" }}
   XY_PASSWORD: ${{ secrets.XY_PASSWORD_PARTNERS }}
   XY_URL: ${{ secrets.XY_URL_PARTNERS }}
