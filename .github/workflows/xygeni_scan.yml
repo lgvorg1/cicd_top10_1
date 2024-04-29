@@ -59,7 +59,7 @@ jobs:
             echo "XY_USERNAME=hola" >> $GITHUB_ENV
           'DEMO')
             echo "DEMO"
-          'PARTNERS'
+          'PARTNERS')
             echo "PARTNERS"
             echo XY_USERNAME=perola >> $GITHUB_ENV
           *)
