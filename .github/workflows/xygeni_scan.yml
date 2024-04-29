@@ -49,11 +49,11 @@ jobs:
         run: |
           KK=PRO
           case $KK in 
-            'PRO')
+            PRO)
               echo "PRO"
-            'DEMO')
+            DEMO)
               echo "DEMO"
-            'PARTNERS')
+            PARTNERS)
               echo "PARTNERS"
             *)
               echo "DEFAULT"
