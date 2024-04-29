@@ -63,7 +63,9 @@ jobs:
               echo XY_USERNAME=$PP >> $GITHUB_ENV
               ;;
             *)
-              echo "DEFAULT"
+              echo "DEFAULT (PRO)"
+              PP=${{ secrets.XY_USERNAME_PRO }}
+              echo XY_USERNAME=$PP >> $GITHUB_ENV
               ;;
           esac
 
