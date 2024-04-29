@@ -51,12 +51,16 @@ jobs:
           case $KK in 
             PRO)
               echo "PRO"
+              ;;
             DEMO)
               echo "DEMO"
+              ;;
             PARTNERS)
               echo "PARTNERS"
+              ;;
             *)
               echo "DEFAULT"
+              ;;
           esac
 
 
