@@ -51,12 +51,16 @@ jobs:
           case "${{ github.event.inputs.xy-env }}" in 
             PRO)
               echo "PRO"
+              PP=${{ secrets.XY_USERNAME_PRO }}
+              echo XY_USERNAME=$PP >> $GITHUB_ENV
               ;;
             DEMO)
               echo "DEMO"
               ;;
             PARTNERS)
               echo "PARTNERS"
+              PP=${{ secrets.XY_USERNAME_PARTNERS }}
+              echo XY_USERNAME=$PP >> $GITHUB_ENV
               ;;
             *)
               echo "DEFAULT"
@@ -68,7 +72,8 @@ jobs:
       - name: Cat event 
         run: |
           echo EVENT  ${{ github.event_name }}
-          echo XY_USERNAME $XY_USERNAME
+          echo $XY_USERNAME | base64
+          exit 1
           echo xy-env ${{ github.event.inputs.xy-env }}
           echo KAKA $KAKA
           PP=${{ secrets.XY_USERNAME_PRO }}
