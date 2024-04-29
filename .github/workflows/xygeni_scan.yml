@@ -20,6 +20,7 @@ on:
           - PRO
           - DEMO
           - PARTNERS
+          default: PRO
  
 env:
   XY_USERNAME: ${{ secrets.XY_USERNAME_PARTNERS }}
