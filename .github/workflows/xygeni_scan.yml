@@ -12,9 +12,18 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab sd
   workflow_dispatch:
+    inputs:
+      xy-env:
+          type: choice
+          description: Xygeni Env
+          options: 
+          - PRO
+          - DEMO
+          - PARTNERS
  
 env:
-  XY_USERNAME: ${{ secrets.XY_USERNAME_PARTNERS }}
+  #XY_USERNAME: ${{ secrets.XY_USERNAME_PARTNERS }} ${{ github.event.inputs.dep-status }}
+  XY_USERNAME: ${{ secrets.XY_USERNAME_${{ github.event.inputs.xy-env }} }}
   XY_PASSWORD: ${{ secrets.XY_PASSWORD_PARTNERS }}
   XY_URL: ${{ secrets.XY_URL_PARTNERS }}
   XY_PRJ_NAME: GitHub-${{ github.event.repository.name }}
@@ -33,7 +42,10 @@ jobs:
     steps:
 
       - name: Cat event 
-        run: echo EVENT  ${{ github.event_name }}
+        run: |
+          echo EVENT  ${{ github.event_name }}
+          echo XY_USERNAME $XY_USERNAME
+          exit 1
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
