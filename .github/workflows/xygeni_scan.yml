@@ -10,7 +10,7 @@ on:
   pull_request_target: 
     branches: [ "main" ]
 
-  # Allows you to run this workflow manually from the Actions tab sd
+  # Allows you to run this workflow manually from the Actions tab sd 
   workflow_dispatch:
     inputs:
       xy-env:
