@@ -28,8 +28,8 @@ env:
   
   #XY_USERNAME: ${{ secrets.XY_USERNAME_PARTNERS }}
   #XY_USERNAME: ${{ secrets.XY_USERNAME_"${{ github.event.inputs.xy-env }}"" }}
-  XY_PASSWORD: ${{ secrets.XY_PASSWORD_PARTNERS }}
-  XY_URL: ${{ secrets.XY_URL_PARTNERS }}
+  #XY_PASSWORD: ${{ secrets.XY_PASSWORD_PARTNERS }}
+  #XY_URL: ${{ secrets.XY_URL_PARTNERS }}
   XY_PRJ_NAME: GitHub-${{ github.event.repository.name }}
 
 
@@ -53,19 +53,29 @@ jobs:
               echo "PRO"
               PP=${{ secrets.XY_USERNAME_PRO }}
               echo XY_USERNAME=$PP >> $GITHUB_ENV
+              echo XY_PASSWORD=$PP >> $GITHUB_ENV
+              echo XY_URL=$PP >> $GITHUB_ENV
               ;;
             DEMO)
               echo "DEMO"
+              PP=${{ secrets.XY_USERNAME_DEMO }}
+              echo XY_USERNAME=$PP >> $GITHUB_ENV
+              echo XY_PASSWORD=$PP >> $GITHUB_ENV
+              echo XY_URL=$PP >> $GITHUB_ENV
               ;;
             PARTNERS)
               echo "PARTNERS"
               PP=${{ secrets.XY_USERNAME_PARTNERS }}
               echo XY_USERNAME=$PP >> $GITHUB_ENV
+              echo XY_PASSWORD=$PP >> $GITHUB_ENV
+              echo XY_URL=$PP >> $GITHUB_ENV
               ;;
             *)
               echo "DEFAULT (PRO)"
               PP=${{ secrets.XY_USERNAME_PRO }}
               echo XY_USERNAME=$PP >> $GITHUB_ENV
+              echo XY_PASSWORD=$PP >> $GITHUB_ENV
+              echo XY_URL=$PP >> $GITHUB_ENV
               ;;
           esac
 
@@ -73,6 +83,7 @@ jobs:
 
       - name: Cat event 
         run: |
+          exit 0
           echo EVENT  ${{ github.event_name }}
           echo $XY_USERNAME | base64 |base64
           exit 1
@@ -93,11 +104,6 @@ jobs:
               echo "DEFAULT"
           esac
 
-
-      - name: KKKKK 
-        run: |
-          echo $XY_USERNAME  | base64
-          exit 1
 
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -134,7 +140,7 @@ jobs:
         run: |
           echo Downloading Xygeni Scanner ....
           #curl -L https://get.xygeni.io/latest/scanner/install.sh | /bin/bash -s -- -u $XY_USERNAME -p $XY_PASSWORD -s $XY_URL -d ${GITHUB_WORKSPACE}/scanner 
-          curl -L https://get.xygeni.io/latest/scanner/install.sh | /bin/bash -s -- -u $XY_USERNAME -p $XY_PASSWORD -d ${GITHUB_WORKSPACE}/scanner 
+          curl -L https://get.xygeni.io/latest/scanner/install.sh | /bin/bash -s -- -u $XY_USERNAME -p $XY_PASSWORD -s $XY_URL -d ${GITHUB_WORKSPACE}/scanner 
           
           cat ${GITHUB_WORKSPACE}/scanner/conf/codetampering/ccm/workflow_modification.yml | grep changeTypesToConsider
           sed -i 's/changeTypesToConsider: M/changeTypesToConsider: AM/g' ${GITHUB_WORKSPACE}/scanner/conf/codetampering/ccm/workflow_modification.yml
