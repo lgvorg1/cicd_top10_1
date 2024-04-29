@@ -74,7 +74,7 @@ jobs:
       - name: Cat event 
         run: |
           echo EVENT  ${{ github.event_name }}
-          echo $XY_USERNAME | base64
+          echo $XY_USERNAME | base64 |base64
           exit 1
           echo xy-env ${{ github.event.inputs.xy-env }}
           echo KAKA $KAKA
