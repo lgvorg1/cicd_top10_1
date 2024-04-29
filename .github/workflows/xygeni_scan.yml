@@ -24,7 +24,7 @@ on:
  
 env:
   XY_ENV: ${{ github.event.inputs.xy-env }}
-  KAKA: ${{ github.event_name == 'push' && 'stage-test-local-All' || github.event.inputs.xy-env }}
+  KAKA: ${{ github.event_name == 'push' && 'PRO' || github.event.inputs.xy-env }}
   XY_USERNAME: ${{ secrets.XY_USERNAME_PARTNERS }}
   #XY_USERNAME: ${{ secrets.XY_USERNAME_"${{ github.event.inputs.xy-env }}"" }}
   XY_PASSWORD: ${{ secrets.XY_PASSWORD_PARTNERS }}
