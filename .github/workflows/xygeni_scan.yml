@@ -47,7 +47,7 @@ jobs:
 
       - name: PPPPPP 
         run: |
-          case "${{ github.event.inputs.xy-env }}" in 
+          case ${{ github.event.inputs.xy-env }} in 
             'PRO')
               echo "PRO"
             'DEMO')
@@ -57,7 +57,7 @@ jobs:
             *)
               echo "DEFAULT"
           esac
-          
+
 
 
       - name: Cat event 
