@@ -54,17 +54,18 @@ jobs:
           PP=${{ secrets.XY_USERNAME_PRO }}
           
           case "${{ github.event.inputs.xy-env }}" in 
-          'PRO')
-            echo "PRO"
-            echo "XY_USERNAME=hola" >> $GITHUB_ENV
-          'DEMO')
-            echo "DEMO"
-          'PARTNERS')
-            echo "PARTNERS"
-            echo XY_USERNAME=perola >> $GITHUB_ENV
-          *)
-            echo "DEFAULT"
-
+            'PRO')
+              echo "PRO"
+              echo "XY_USERNAME=hola" >> $GITHUB_ENV
+            'DEMO')
+              echo "DEMO"
+            'PARTNERS')
+              echo "PARTNERS"
+              echo XY_USERNAME=perola >> $GITHUB_ENV
+            *)
+              echo "DEFAULT"
+          esac
+          
 
       - name: KKKKK 
         run: |
