@@ -51,10 +51,10 @@ jobs:
           case "$XY_ENV" in 
             PRO)
               echo "PRO"
-              PP=${{ secrets.XY_USERNAME_PRO }}
-              echo XY_USERNAME=$PP >> $GITHUB_ENV
-              echo XY_PASSWORD=$PP >> $GITHUB_ENV
-              echo XY_URL=$PP >> $GITHUB_ENV
+              #PP=${{ secrets.XY_USERNAME_PRO }}
+              echo XY_USERNAME=${{ secrets.XY_USERNAME_PRO }} >> $GITHUB_ENV
+              echo XY_PASSWORD=${{ secrets.XY_PASSWORD_PRO }} >> $GITHUB_ENV
+              echo XY_URL=${{ secrets.XY_URL_PRO }} >> $GITHUB_ENV
               ;;
             DEMO)
               echo "DEMO"
