@@ -47,7 +47,8 @@ jobs:
 
       - name: PPPPPP 
         run: |
-          case ${{ github.event.inputs.xy-env }} in 
+          KK=PRO
+          case $KK in 
             'PRO')
               echo "PRO"
             'DEMO')
