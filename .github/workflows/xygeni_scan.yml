@@ -45,6 +45,21 @@ jobs:
   
     steps:
 
+      - name: PPPPPP 
+        run: |
+          case "${{ github.event.inputs.xy-env }}" in 
+            'PRO')
+              echo "PRO"
+            'DEMO')
+              echo "DEMO"
+            'PARTNERS')
+              echo "PARTNERS"
+            *)
+              echo "DEFAULT"
+          esac
+          
+
+
       - name: Cat event 
         run: |
           echo EVENT  ${{ github.event_name }}
@@ -65,7 +80,7 @@ jobs:
             *)
               echo "DEFAULT"
           esac
-          
+
 
       - name: KKKKK 
         run: |
