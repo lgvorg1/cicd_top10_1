@@ -65,8 +65,6 @@ jobs:
           *)
             echo "DEFAULT"
 
-          #if [ ${{ github.event.inputs.xy-env }} == 'PRO ]; then
-          exit 0
 
       - name: KKKKK 
         run: |
