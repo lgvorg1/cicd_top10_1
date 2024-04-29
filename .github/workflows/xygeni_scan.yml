@@ -23,6 +23,8 @@ on:
           default: PRO
  
 env:
+  XY_ENV: ${{ github.event.inputs.xy-env }}
+  KAKA: ${{ github.event_name == 'schedule' && 'stage-test-local-All' || github.event.inputs.xy-env }}
   XY_USERNAME: ${{ secrets.XY_USERNAME_PARTNERS }}
   #XY_USERNAME: ${{ secrets.XY_USERNAME_"${{ github.event.inputs.xy-env }}"" }}
   XY_PASSWORD: ${{ secrets.XY_PASSWORD_PARTNERS }}
@@ -47,6 +49,7 @@ jobs:
           echo EVENT  ${{ github.event_name }}
           echo XY_USERNAME $XY_USERNAME
           echo xy-env ${{ github.event.inputs.xy-env }}
+          echo KAKA $KAKA
           exit 1
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
