@@ -23,8 +23,8 @@ on:
           default: PRO
  
 env:
-  XY_ENV: ${{ github.event.inputs.xy-env }}
-  KAKA: XY_USERNAME_${{ github.event_name == 'push' && 'PRO' || github.event.inputs.xy-env }}
+  
+  XY_ENV: ${{ github.event_name == 'push' && 'PRO' || github.event.inputs.xy-env }}
   
   #XY_USERNAME: ${{ secrets.XY_USERNAME_PARTNERS }}
   #XY_USERNAME: ${{ secrets.XY_USERNAME_"${{ github.event.inputs.xy-env }}"" }}
@@ -45,10 +45,10 @@ jobs:
   
     steps:
 
-      - name: PPPPPP 
+      - name: Set env 
         run: |
-          KK=PRO
-          case "${{ github.event.inputs.xy-env }}" in 
+
+          case "$XY_ENV" in 
             PRO)
               echo "PRO"
               PP=${{ secrets.XY_USERNAME_PRO }}
