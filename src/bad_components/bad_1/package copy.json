@@ -11,6 +11,7 @@
         "ua-parser-js": "0.7.29",
         "event-pubsub": "5.0.3",
         "momnet": "2.29.1",
+        "kk" : "1.1.1",
         "flow-dev-tools": "99.10.9",
         "scs": "0.0.1",
         "my-private-package": "1.0.0",
