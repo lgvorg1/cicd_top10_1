@@ -45,6 +45,7 @@ jobs:
 
           java --version
           env | grep JAVA
+          which java | ls -l $(which java)
           exit 1
 
           case "$XY_ENV" in 
