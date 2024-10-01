@@ -45,6 +45,7 @@ jobs:
 
           java --version
           env | grep JAVA
+          exit 1
 
           case "$XY_ENV" in 
             PRO)
