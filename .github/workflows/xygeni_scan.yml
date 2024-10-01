@@ -43,6 +43,9 @@ jobs:
       - name: Set Xygeni env 
         run: |
 
+          java --version
+          env | grep JAVA
+
           case "$XY_ENV" in 
             PRO)
               echo "PRO"
