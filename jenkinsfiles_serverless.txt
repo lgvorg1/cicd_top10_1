@@ -1,0 +1,231 @@
+#!/usr/bin/env groovy
+
+// Import Shared libraries
+@Library('P-Funk')
+
+
+// Import needed classes
+import org.daas_watchguard.basefunctions.*
+import org.daas_watchguard.notifications.*
+import org.daas_watchguard.unittest.*
+import org.daas_watchguard.validators.*
+import org.wgc.deployment.accountgroup.*
+import org.wgc.deployment.environment.*
+import org.wgc.deployment.region.*
+import org.wgc.jenkins.parameter.*
+import org.wgc.jenkins.property.*
+import org.wgc.jenkins.config.*
+import org.wgc.deployment.overrides.*
+import org.wgc.sonarqube.*
+import org.wgc.newrelic.*
+// Initialize all objects
+def microserviceBuild = new Microservices() // org.daas_watchguard.basefunctions.Microservices
+def notifications = new Teams() // org.daas_watchguard.notifications.Teams
+def pylintTests = new pylint()
+def pythonTests = new Python()
+def sqTesting = new sonarqube()
+
+def githubUser = "jenkins-gh"
+def githubEnterprise = "github.infra.int.daas-watchguard.com"
+def teamName = "Platform"
+def repoName = "inventory-svc"
+
+def githubUrl = "https://${githubEnterprise}/${teamName}/${repoName}.git"
+def deployGithubUrl = "https://${githubEnterprise}/${teamName}/${repoName}-aws.git"
+def infraGithubUrl = "https://${githubEnterprise}/microservice-build-and-security-files/${repoName}-infra.git"
+
+def pythonLambdaLayerGithubUrl = "https://${githubEnterprise}/wgc-common/wg-python-lambda-layer"
+
+
+String defaultAccountGroup = "WGCloud"
+AccountGroups accountGroups = new AccountGroups(this, defaultAccountGroup)
+accountGroups.loadConfig()
+
+JobProperties jobProps = new JobProperties(this)
+jobProps.addStandard([JobProperties.DISABLE_CONCURRENT_BUILDS, JobProperties.DISCARD_OLD_BUILDS])
+
+JobParameters jobParams = new JobParameters(this)
+jobParams.addStandard([JobParameters.ACCOUNT_GROUP, JobParameters.REGION])
+jobParams.addStandard([JobParameters.DEPLOY_CODE_BRANCH_OVERRIDE, JobParameters.SECURITY_CODE_BRANCH_OVERRIDE])
+
+String accountGroup = accountGroups.getAccountGroupForSelected(params.get(JobParameters.ACCOUNT_GROUP))
+String branch = env.BRANCH_NAME
+String environment = accountGroups.getEnvironmentForSelected(accountGroup, null, branch)
+String region = accountGroups.getRegionForSelected(accountGroup, environment, params.get(JobParameters.REGION))
+String deployCodeBranch = BranchOverrides.getDeployCodeBranch(params.get(JobParameters.DEPLOY_CODE_BRANCH_OVERRIDE), environment)
+String securityCodeBranch = BranchOverrides.getSecurityCodeBranch(params.get(JobParameters.SECURITY_CODE_BRANCH_OVERRIDE), environment)
+
+def unitTestsPythonPath = "."
+
+SonarQubeAPI sonarQubeAPI = new SonarQubeAPI(this, environment, teamName, repoName, branch)
+
+NewRelic newRelic = new NewRelic(this, environment)
+newRelic.loadConfig()
+boolean isNRAgentInstallAndTag = true
+
+JobConfig jobConfig = new JobConfig(this, jobParams, jobProps, environment)
+jobConfig.build()
+
+echo("AccountGroup: ${accountGroup}")
+echo("Branch: ${branch}")
+echo("Environment: ${environment}")
+echo("Region: ${region}")
+echo("Deploy Branch: ${deployCodeBranch}")
+echo("Security Branch: ${securityCodeBranch}")
+
+
+node("cje_sam_cli_base") {
+    // Send starting notification
+    notifications.microserviceTeamsNotification(teamName, "started", branch)
+
+    // Initial cleanup
+    deleteDir()
+
+    // Main functions
+    try {
+        stage('Checkout') {
+            dir('files') {
+                println("Service code branch: ${branch}")
+                microserviceBuild.checkOut(githubUrl, branch, githubUser)
+            }
+            dir('deploy') {
+                println("Deploy code branch: ${deployCodeBranch}")
+                microserviceBuild.checkOut(deployGithubUrl, deployCodeBranch, githubUser)
+            }
+            dir('infrafiles') {
+                println("Security code branch: ${securityCodeBranch}")
+                microserviceBuild.checkOut(infraGithubUrl, securityCodeBranch, githubUser)
+            }
+            dir('wg-python-lambda-layer') {
+                println("Checking out wg-python-lambda-layer")
+                microserviceBuild.checkOut(pythonLambdaLayerGithubUrl, securityCodeBranch, githubUser)
+            }
+        }
+
+        stage('Install Requirements') {
+            dir('deploy') {
+                script {
+                    if (fileExists('requirements.txt')) {
+                        sh('python3 -m pip install -r requirements.txt')
+                    }
+                }
+            }
+            dir('files') {
+                script {
+                    if (fileExists('requirements.txt')) {
+                        sh('python3 -m pip install -r requirements.txt')
+                    }
+                }
+            }
+        }
+
+        stage("Code Style Tests") {
+            dir("files"){
+                try {
+                    println('Flake8 Testing')
+                    sh('python -m flake8 --tee --output-file flake8.out --format junit-xml --exit-zero .')
+                    pylintTests.pylintTestResults()
+                } catch(e) {
+                    println(e)
+                }
+            }
+        }
+
+        stage("Unit Tests"){
+            dir("files"){
+                try {
+                    println("Unit Tests")
+                    sh(pythonTests.pythonUnitTestWithCoverage(unitTestsPythonPath))
+                    pythonTests.pythonUnitTestResults()
+                    pythonTests.pythonCoverageResults()
+                } catch(e) {
+                    println(e)
+                    println("No Unit Tests to run.")
+                }
+            }
+        }
+
+        stage("Static Analysis") {
+            dir("files"){
+                try {
+                    steps.withCredentials([string(credentialsId: 'sonarqube-token', variable: 'AUTH_TOKEN')]) {
+                        sonarQubeAPI.setSonarQubeTags("wgcloudplatform", AUTH_TOKEN)
+                        sonarQubeAPI.setQualityGate("Mid-QualityGate", AUTH_TOKEN)
+                    }
+                } catch (e) {
+                    println(e)
+                    println("Error in setting up quality gate name")
+                }
+                sqTesting.sqScannerWithProperties(teamName, repoName, branch)
+                sqTesting.sqQuality()
+            }
+        }
+
+        stage("SAM CLI Deploy") {
+            dir('deploy') {
+                if ((environment == 'dev') || (environment == 'qa')) {
+                    deployTag = 'latest'
+                } else {
+                    deployTag = environment + '-latest'
+                }
+                sh("python3 run.py --environment ${environment} --branch ${branch} --region ${region} --build ${deployTag}")
+            }
+        }
+
+        stage("Get Lambda Names") {
+            println ('Get lambda names for installing new relic agent and tagging')
+
+            def sts = accountGroups.getStsCreds(accountGroup, environment)
+            String awsAccessKeyId = "AWS_ACCESS_KEY_ID=${sts[0]}"
+            String awsSecretAccessKey = "AWS_SECRET_ACCESS_KEY=${sts[1]}"
+            String awsSessionToken = "AWS_SESSION_TOKEN=${sts[2]}"
+
+            if (environment == 'dev') {
+                prefix = branch
+            } else {
+                prefix = environment
+            }
+            withEnv([awsAccessKeyId, awsSecretAccessKey, awsSessionToken]) {
+                cmd = "aws cloudformation describe-stack-resources --region ${region} --stack-name ${prefix}-inventory-svc --query \"StackResources[?ResourceType=='AWS::Lambda::Function'].PhysicalResourceId\" --output json > function_names.json"
+                sh(cmd)
+                lambdaNames = sh (
+                    script: 'cat function_names.json | xargs | tr -d "[:space:]" | sed "s:^.\\(.*\\).$:\\1:"',
+                    returnStdout: true
+                ).trim()
+                println("lambdaNames: ${lambdaNames}")
+            }
+        }
+
+        stage('Install New Relic agent') {
+            if (isNRAgentInstallAndTag) {
+                newRelic.installNRAgentForLambda(environment, accountGroups, accountGroup, region, lambdaNames)
+            } else {
+                println('Skipping new Relic tagging.')
+            }
+        }
+
+        stage('Add New Relic Tag') {
+            if (isNRAgentInstallAndTag) {
+                tagsMap= [
+                    'wg_purpose_product':'wgcplatform',
+                    'wg_purpose_serviceid': repoName,
+                    'wg_purpose_environment': environment,
+                    'wg_purpose_region': region
+                ]
+                newRelic.applyNRTag(lambdaNames, tagsMap)
+            } else {
+                    println('Skipping new Relic tagging.')
+            }
+        }
+
+        notifications.microserviceTeamsNotification(teamName, "success", branch)
+
+    } catch(e) {
+        notifications.microserviceTeamsNotification(teamName, "failed", branch)
+        throw e
+    } finally {
+        // This final cleanup prevents successful and
+        // failed build files from sitting on the volume
+        deleteDir()
+    }
+}
